@@ -41,10 +41,13 @@ class AndroidBugScanner:
     def scan_vulnerable_code(self, dx):
         # Find the usage of external methods, which may be a potential vulnerability
         for method in dx.get_methods():
-            if isinstance(method, ExternalMethod):
+            # External methods are potential entry points for risky behaviour
+            if method.is_external():
                 # Checking for potentially insecure methods
                 if "java.net.HttpURLConnection" in method.class_name:
-                    self.report.append(f"Potential Insecure HTTP Call in Method: {method.name} in class {method.class_name}")
+                    self.report.append(
+                        f"Potential Insecure HTTP Call in Method: {method.name} in class {method.class_name}"
+                    )
 
     def generate_report(self):
         report_file = os.path.splitext(os.path.basename(self.apk_path))[0] + "_bug_report.txt"
